@@ -12,7 +12,11 @@ def samples_matching(pt_info, column_selections, sample_key="Sequencing Name"):
     matched = set()
     for column, values in column_selections.items():
         if values:
-            matched |= set(pt_info.loc[pt_info[column].isin(values), sample_key])
+            # dropna: a row can match a filter value while its sample-name
+            # cell is blank (NaN); a float in the set breaks sorted()/join().
+            matched |= set(
+                pt_info.loc[pt_info[column].isin(values), sample_key].dropna()
+            )
     return matched
 
 

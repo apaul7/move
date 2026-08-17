@@ -218,6 +218,21 @@ def test_samples_matching_value_absent_from_frame():
     assert samples_matching(PT_INFO, {"Sample Status": ["Unknown"]}) == set()
 
 
+def test_samples_matching_drops_blank_sample_names():
+    pt = pd.concat(
+        [
+            PT_INFO,
+            pd.DataFrame(
+                [{"Sequencing Name": None, "Sample Status": "Affected", "Sequencing Round": 3}]
+            ),
+        ],
+        ignore_index=True,
+    )
+    matched = samples_matching(pt, {"Sample Status": ["Affected"]})
+    assert matched == {"s1", "s2"}
+    sorted(matched)  # regression: NaN in the set made sorted() raise TypeError
+
+
 def test_build_export_csv_header_and_roundtrip():
     unfiltered = pd.DataFrame(
         [
