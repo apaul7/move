@@ -1,0 +1,10 @@
+# Local dev config pointing at the dummy dataset in test_data/.
+# Run with: MOVE_CONFIG_PATH=test_data/config.toml streamlit run app.py
+
+[paths]
+merged_readcount_dir = "test_data/readcount/"
+normalized_variant_path = "test_data/sample_call_key.tsv"
+raw_variant_path = "test_data/raw.sample_call_key.tsv"
+annotation_path = "test_data/annotations.tsv"
+igv_soft_mask_path = "test_data/igv.softmask.bed.gz"
+patient_info_path = "test_data/patient_info.xlsx"

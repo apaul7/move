@@ -1,0 +1,9 @@
+streamlit==1.58.0
+pandas==3.0.3
+pyarrow==24.0.0
+numpy==2.4.6
+altair
+openpyxl
+natsort
+pytest
+requests

@@ -1,0 +1,20 @@
+# Copy this file to config.toml (or point MOVE_CONFIG_PATH at a copy
+# elsewhere) and fill in paths for your environment. app.py validates that
+# every path below exists at startup and refuses to run otherwise.
+
+[paths]
+# Example paths mirror the output layout of the somatic_immuno pipeline
+# (https://github.com/apaul7/somatic_immuno, part 2: merge/annotate/readcount).
+merged_readcount_dir = "/path/to/somatic_immuno/results/03_readcount/merged/"
+normalized_variant_path = "/path/to/somatic_immuno/results/01_merge/sample_call_key.tsv"
+raw_variant_path = "/path/to/somatic_immuno/results/01_merge/raw.sample_call_key.tsv"
+annotation_path = "/path/to/somatic_immuno/results/02_annotate/annotations.tsv"
+# BED file of softmasked (lowercase-masked, i.e. repetitive) regions from the
+# GRCh38/hg38 reference genome as used by IGV (not a pipeline output). Used to
+# flag/exclude variants falling in low-complexity regions (see the "Low
+# Complexity Filter" option).
+igv_soft_mask_path = "/path/to/references/igv.softmask.bed.gz"
+# Either a .xlsx/.xls/.xlsm file (read from the "Patient Information" sheet)
+# or a .tsv/.txt file. Columns are read dynamically from the file's header
+# row, so any columns can be added/removed without changing app.py.
+patient_info_path = "/path/to/patient_info.xlsx"

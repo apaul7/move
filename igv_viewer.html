@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IGV.js</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: white;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        color: black;
+      }
+
+      #igv_div {
+        width: 100%;
+        height: 100vh;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="igv_div"></div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/igv@3.0.0/dist/igv.min.js"
+      integrity="sha384-idC57EVxSYD3A4bj2l0Q1SmTRCVeq8j9S8rQiWPvDwQvVHDPvo2wRzviwG8zEYhj"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      function parsePageParams() {
+        const params = new URLSearchParams(window.location.search);
+
+        const chromosome = params.get("chromosome") || null;
+        const positionRaw = params.get("position");
+        const position = positionRaw ? parseInt(positionRaw, 10) : null;
+
+        const sampleValues = [];
+
+        for (const value of params.getAll("sample")) {
+          sampleValues.push(...value.split(",").map(s => s.trim()).filter(Boolean));
+        }
+
+        for (const value of params.getAll("samples")) {
+          sampleValues.push(...value.split(",").map(s => s.trim()).filter(Boolean));
+        }
+
+        const samples = [...new Set(sampleValues)];
+
+        return {
+          chromosome,
+          position: Number.isFinite(position) ? position : null,
+          samples
+        };
+      }
+
+      function buildAlignmentUrl(sample) {
+        return `/alignments/${encodeURIComponent(sample)}`;
+      }
+
+      function buildIndexUrl(sample) {
+        return `/alignments/${encodeURIComponent(sample)}.crai`;
+      }
+
+      async function main() {
+        const pageParams = parsePageParams();
+        console.log("Parsed URL params:", pageParams);
+
+        const div = document.getElementById("igv_div");
+
+        const config = {
+          genome: "hg38"
+        };
+
+        const browser = await igv.createBrowser(div, config);
+
+        if (pageParams.chromosome && pageParams.position !== null) {
+          await browser.search(`${pageParams.chromosome}:${pageParams.position}`);
+        } else if (pageParams.chromosome) {
+          await browser.search(pageParams.chromosome);
+        }
+
+        for (const sample of pageParams.samples) {
+          await browser.loadTrack({
+            type: "alignment",
+            format: "cram",
+            url: buildAlignmentUrl(sample),
+            indexURL: buildIndexUrl(sample),
+            label: sample,
+            displayMode: "SQUISHED",
+            samplingDepth: 10000,
+            sort: {
+              chr: pageParams.chromosome,
+              position: pageParams.position,
+              option: "BASE",
+              direction: "ASC"
+            }
+          });
+        }
+      }
+
+      main();
+    </script>
+  </body>
+</html>
